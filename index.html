@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>龙虾版大势/风格研判仪表盘 V1.0 | 华泰策略框架</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --success: #34a853;
+            --danger: #ea4335;
+            --warning: #fbbc04;
+            --purple: #9334e6;
+            --bg-dark: #0f1419;
+            --bg-card: #1e2530;
+            --bg-card-hover: #282e3a;
+            --text-primary: #e8eaed;
+            --text-secondary: #9aa0a6;
+            --border: #3c4043;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 16px;
+        }
+        
+        /* 标题栏 */
+        .header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border);
+        }
+        
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .version-badge {
+            background: var(--purple);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .header-frame {
+            color: var(--text-secondary);
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+        
+        .header-frame span {
+            background: rgba(102, 126, 234, 0.2);
+            padding: 3px 10px;
+            border-radius: 4px;
+            margin-right: 8px;
+        }
+        
+        .header-meta {
+            display: flex;
+            gap: 20px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            flex-wrap: wrap;
+        }
+        
+        .header-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .header-meta-item strong {
+            color: var(--primary);
+        }
+        
+        .data-source-bar {
+            background: rgba(26, 115, 232, 0.1);
+            border-top: 1px solid rgba(26, 115, 232, 0.2);
+            margin-top: 12px;
+            padding-top: 12px;
+            font-size: 11px;
+            color: var(--text-secondary);
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .data-source-bar span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .data-source-bar strong {
+            color: var(--primary);
+        }
+        
+        /* 风格研判区域 */
+        .style-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .style-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border);
+        }
+        
+        .style-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .style-title {
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .style-badge {
+            padding: 4px 14px;
+            border-radius: 16px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        
+        .badge-small { background: var(--primary); color: white; }
+        .badge-neutral { background: var(--warning); color: #333; }
+        
+        .style-content {
+            color: var(--text-secondary);
+            font-size: 13px;
+            line-height: 1.7;
+            margin-bottom: 12px;
+        }
+        
+        .style-tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        
+        .style-tag {
+            background: rgba(102, 126, 234, 0.2);
+            color: var(--purple);
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+        
+        /* 情绪温度计 */
+        .temperature-section {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            margin-bottom: 16px;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .temp-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .temp-card {
+            background: var(--bg-card-hover);
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+        
+        .temp-name {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        
+        .temp-gauge {
+            height: 80px;
+            margin-bottom: 8px;
+        }
+        
+        .temp-value {
+            font-size: 20px;
+            font-weight: 700;
+        }
+        
+        .temp-desc {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+        
+        /* 行业温度 */
+        .industry-temp {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        
+        .industry-list {
+            background: var(--bg-card-hover);
+            border-radius: 10px;
+            padding: 14px;
+            border: 1px solid var(--border);
+        }
+        
+        .industry-list-title {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .industry-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .industry-item:last-child { border-bottom: none; }
+        
+        .industry-name { font-size: 13px; }
+        
+        .industry-temp-value {
+            font-size: 13px;
+            font-weight: 600;
+        }
+        
+        .temp-hot { color: var(--danger); }
+        .temp-cold { color: var(--success); }
+        
+        /* 筹码分布 */
+        .chips-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .chip-card {
+            background: var(--bg-card-hover);
+            border-radius: 10px;
+            padding: 14px;
+            border: 1px solid var(--border);
+        }
+        
+        .chip-title {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .chip-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            font-size: 12px;
+        }
+        
+        .chip-item-name { color: var(--text-secondary); }
+        .chip-item-value { font-weight: 600; }
+        
+        .key-finding {
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 8px;
+            padding: 14px;
+            margin-top: 14px;
+        }
+        
+        .key-finding-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--purple);
+            margin-bottom: 6px;
+        }
+        
+        .key-finding-content {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+        
+        /* 三维度信号 */
+        .signals-section {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            margin-bottom: 16px;
+        }
+        
+        .signals-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+        
+        .signal-card {
+            background: var(--bg-card-hover);
+            border-radius: 10px;
+            padding: 16px;
+            border: 1px solid var(--border);
+        }
+        
+        .signal-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .signal-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .signal-item:last-child { border-bottom: none; }
+        
+        .signal-name { font-size: 12px; color: var(--text-secondary); }
+        
+        .signal-value {
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        .status-bull { background: rgba(234, 67, 53, 0.2); color: var(--danger); }
+        .status-bear { background: rgba(52, 168, 83, 0.2); color: var(--success); }
+        .status-neutral { background: rgba(251, 188, 4, 0.2); color: var(--warning); }
+        
+        /* 页脚 */
+        .footer {
+            text-align: center;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 11px;
+        }
+        
+        @media (max-width: 1024px) {
+            .style-section { grid-template-columns: 1fr; }
+            .temp-grid { grid-template-columns: repeat(2, 1fr); }
+            .industry-temp { grid-template-columns: 1fr; }
+            .chips-section { grid-template-columns: 1fr; }
+            .signals-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 标题栏 -->
+    <div class="header">
+        <div class="header-top">
+            <h1>🦞 龙虾版大势/风格研判仪表盘</h1>
+            <span class="version-badge">V1.0</span>
+        </div>
+        <div class="header-frame">
+            <span>📊 框架：华泰多周期叠加</span>
+            <span>🌡️ 市场情绪温度计</span>
+            <span>📈 历史复盘</span>
+        </div>
+        <div class="header-meta">
+            <div class="header-meta-item">
+                <span>📡</span>
+                <span>数据更新时间：</span>
+                <strong id="updateTime">2026-04-28 14:20</strong>
+            </div>
+            <div class="header-meta-item">
+                <span>⏰</span>
+                <span>下次更新：</span>
+                <strong>周一 09:30</strong>
+            </div>
+        </div>
+        <div class="data-source-bar">
+            <span><strong>📡 数据来源：</strong></span>
+            <span>NeoData Financial Search（行情/财务/宏观）</span>
+            <span>腾讯自选股 westock-data（资金/板块）</span>
+            <span>国家统计局（宏观指标）</span>
+            <span>Wind/同花顺（基金持仓）</span>
+        </div>
+    </div>
+
+    <!-- 风格研判 -->
+    <div class="style-section">
+        <div class="style-card">
+            <div class="style-header">
+                <span class="style-title">📊 风格一：市值风格</span>
+                <span class="style-badge badge-small" id="style-marketcap-badge">小盘占优</span>
+            </div>
+            <div class="style-content" id="style-marketcap-content">
+                当前小盘风格持续占优，国证2000年初至今+8.58%，中证1000涨+8.44%，显著跑赢沪深300的+2.82%。资金活跃度数据显示小盘股换手率持续高于大盘，反映市场风险偏好提升。
+            </div>
+            <div class="style-tags">
+                <span class="style-tag">小盘成长</span>
+                <span class="style-tag">国证2000</span>
+                <span class="style-tag">中证1000</span>
+                <span class="style-tag">高弹性</span>
+            </div>
+            <div style="margin-top: 12px; font-size: 12px; color: var(--text-secondary);">
+                切换预判：若沪深300站稳4000点，大盘蓝筹有望接力
+            </div>
+        </div>
+        
+        <div class="style-card">
+            <div class="style-header">
+                <span class="style-title">📈 风格二：估值风格</span>
+                <span class="style-badge badge-neutral" id="style-valuation-badge">再均衡</span>
+            </div>
+            <div class="style-content" id="style-valuation-content">
+                成长与价值风格进入拉锯期。国证成长(+7.93%) vs 国证价值(+1.52%)，成长领先优势收窄。科技板块短期波动加大，但AI产业趋势未变；价值风格受益于产能周期拐点预期。
+            </div>
+            <div class="style-tags">
+                <span class="style-tag">成长略优</span>
+                <span class="style-tag">国证成长</span>
+                <span class="style-tag">AI/科技</span>
+                <span class="style-tag">拉锯期</span>
+            </div>
+            <div style="margin-top: 12px; font-size: 12px; color: var(--text-secondary);">
+                切换预判：Q2财报验证期，价值股有望占优
+            </div>
+        </div>
+    </div>
+
+    <!-- 市场情绪温度计 -->
+    <div class="temperature-section">
+        <div class="section-title">🌡️ 市场情绪温度计</div>
+        
+        <!-- 宽基指数温度 -->
+        <div class="temp-grid">
+            <div class="temp-card">
+                <div class="temp-name">上证指数</div>
+                <div class="temp-gauge" id="gauge-sh000001"></div>
+                <div class="temp-value" id="temp-sh000001">65°</div>
+                <div class="temp-desc">适中偏暖</div>
+            </div>
+            <div class="temp-card">
+                <div class="temp-name">深证成指</div>
+                <div class="temp-gauge" id="gauge-sz399001"></div>
+                <div class="temp-value" id="temp-sz399001">72°</div>
+                <div class="temp-desc">情绪升温</div>
+            </div>
+            <div class="temp-card">
+                <div class="temp-name">创业板指</div>
+                <div class="temp-gauge" id="gauge-sz399006"></div>
+                <div class="temp-value" id="temp-sz399006">78°</div>
+                <div class="temp-desc">较热</div>
+            </div>
+            <div class="temp-card">
+                <div class="temp-name">科创50</div>
+                <div class="temp-gauge" id="gauge-sh000688"></div>
+                <div class="temp-value" id="temp-sh000688">75°</div>
+                <div class="temp-desc">情绪偏高</div>
+            </div>
+        </div>
+        
+        <!-- 行业温度 -->
+        <div class="industry-temp">
+            <div class="industry-list">
+                <div class="industry-list-title">🔥 高温行业 TOP5 <span style="color: var(--danger);">▲</span></div>
+                <div class="industry-item">
+                    <span class="industry-name">航海装备</span>
+                    <span class="industry-temp-value temp-hot">92°</span>
+                </div>
+                <div class="industry-item">
+                    <span class="industry-name">医疗服务</span>
+                    <span class="industry-temp-value temp-hot">85°</span>
+                </div>
+                <div class="industry-item">
+                    <span class="industry-name">工程机械</span>
+                    <span class="industry-temp-value temp-hot">78°</span>
+                </div>
+                <div class="industry-item">
+                    <span class="industry-name">煤炭开采</span>
+                    <span class="industry-temp-value temp-hot">72°</span>
+                </div>
+                <div class="industry-item">
+                    <span class="industry-name">白色家电</span>
+                    <span class="industry-temp-value temp-hot">65°</span>
+                </div>
+            </div>
+            <div class="industry-list">
+                <div class="industry-list-title">❄️ 低温行业 TOP5 <span style="color: var(--success);">▼</span></div>
+                <div class="industry-item">
+                    <span class="industry-name">房地产</span>
+                    <span class="industry-temp-value temp-cold">25°</span>
+                </div>
+                <div class="industry-item">
+                    <span class="industry-name">建筑材料</span>
+                    <span class="industry-temp-value temp-cold">30°</span>
+                </div>
+                <div class="industry-item">
+                    <span class="industry-name">商贸零售</span>
+                    <span class="industry-temp-value temp-cold">35°</span>
+                </div>
+                <div class="industry-item">
+                    <span class="industry-name">传媒</span>
+                    <span class="industry-temp-value temp-cold">42°</span>
+                </div>
+                <div class="industry-item">
+                    <span class="industry-name">非银金融</span>
+                    <span class="industry-temp-value temp-cold">48°</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 筹码分布 -->
+    <div class="temperature-section">
+        <div class="section-title">💼 筹码分布</div>
+        
+        <div class="chips-section">
+            <div class="chip-card">
+                <div class="chip-title">⚠️ 高位资产 (>95%分位)</div>
+                <div class="chip-item">
+                    <span class="chip-item-name">通信设备</span>
+                    <span class="chip-item-value" style="color: var(--danger);">98%</span>
+                </div>
+                <div class="chip-item">
+                    <span class="chip-item-name">游戏</span>
+                    <span class="chip-item-value" style="color: var(--danger);">97%</span>
+                </div>
+                <div class="chip-item">
+                    <span class="chip-item-name">有色金属</span>
+                    <span class="chip-item-value" style="color: var(--danger);">96%</span>
+                </div>
+                <div class="chip-item">
+                    <span class="chip-item-name">非银金融</span>
+                    <span class="chip-item-value" style="color: var(--danger);">95%</span>
+                </div>
+            </div>
+            
+            <div class="chip-card">
+                <div class="chip-title">💎 低位资产 (<10%分位)</div>
+                <div class="chip-item">
+                    <span class="chip-item-name">房地产</span>
+                    <span class="chip-item-value" style="color: var(--success);">5%</span>
+                </div>
+                <div class="chip-item">
+                    <span class="chip-item-name">商贸零售</span>
+                    <span class="chip-item-value" style="color: var(--success);">8%</span>
+                </div>
+                <div class="chip-item">
+                    <span class="chip-item-name">建筑材料</span>
+                    <span class="chip-item-value" style="color: var(--success);">7%</span>
+                </div>
+                <div class="chip-item">
+                    <span class="chip-item-name">农林牧渔</span>
+                    <span class="chip-item-value" style="color: var(--success);">9%</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="key-finding">
+            <div class="key-finding-title">🔍 关键发现</div>
+            <div class="key-finding-content">
+                1. 机构持仓高度集中于科技成长板块（通信/游戏/AI），筹码高位集中需警惕回调风险<br>
+                2. 消费/地产链筹码出清较为充分，基金低配明显，安全边际较高<br>
+                3. 内需消费（家电/食品饮料）成为资金避风港，关注Q2业绩验证
+            </div>
+        </div>
+    </div>
+
+    <!-- 三维度信号面板 -->
+    <div class="signals-section">
+        <div class="section-title">🎯 三维度信号面板</div>
+        <div class="signals-grid">
+            <div class="signal-card">
+                <div class="signal-title">🧮 维度一：盈利周期（分子）</div>
+                <div class="signal-item">
+                    <span class="signal-name">PPI同比</span>
+                    <span class="signal-value status-neutral">+1.1%</span>
+                </div>
+                <div class="signal-item">
+                    <span class="signal-name">工业企业利润</span>
+                    <span class="signal-value status-neutral">待确认</span>
+                </div>
+                <div class="signal-item">
+                    <span class="signal-name">库存周期</span>
+                    <span class="signal-value status-bull">主动补库</span>
+                </div>
+                <div class="signal-item">
+                    <span class="signal-name">产能利用率</span>
+                    <span class="signal-value status-neutral">73.6%</span>
+                </div>
+                <div class="signal-item">
+                    <span class="signal-name">综合信号</span>
+                    <span class="signal-value status-neutral">弱正</span>
+                </div>
+            </div>
+            
+            <div class="signal-card">
+                <div class="signal-title">💹 维度二：估值资金（分母）</div>
+                <div class="signal-item">
+                    <span class="signal-name">全市场PE分位</span>
+                    <span class="signal-value status-neutral">~70%</span>
+                </div>
+                <div class="signal-item">
+                    <span class="signal-name">北向资金</span>
+                    <span class="signal-value status-bull">净流入</span>
+                </div>
+                <div class="signal-item">
+                    <span class="signal-name">主力资金(5日)</span>
+                    <span class="signal-value status-bear">-932亿</span>
+                </div>
+                <div class="signal-item">
+                    <span class="signal-name">两融余额</span>
+                    <span class="signal-value status-neutral">平稳</span>
+                </div>
+                <div class="signal-item">
+                    <span class="signal-name">综合信号</span>
+                    <span class="signal-value status-neutral">中性</span>
+                </div>
+            </div>
+            
+            <div class="signal-card">
+                <div class="signal-title">🔄 维度三：多周期共振</div>
+                <div class="signal-item">
+                    <span class="signal-name">库存周期</span>
+                    <span class="signal-value status-bull">向上</span>
+                </div>
+                <div class="signal-item">
+                    <span class="signal-name">产能周期</span>
+                    <span class="signal-value status-neutral">磨底</span>
+                </div>
+                <div class="signal-item">
+                    <span class="signal-name">地产周期</span>
+                    <span class="signal-value status-neutral">等待</span>
+                </div>
+                <div class="signal-item">
+                    <span class="signal-name">外部环境</span>
+                    <span class="signal-value status-neutral">改善</span>
+                </div>
+                <div class="signal-item">
+                    <span class="signal-name">综合信号</span>
+                    <span class="signal-value status-neutral">弱共振</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 综合研判结论 -->
+    <div class="temperature-section">
+        <div class="section-title">📋 综合研判结论</div>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+            <div class="chip-card" style="text-align: center;">
+                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">大势研判</div>
+                <div style="font-size: 18px; font-weight: 600; color: var(--primary);">震荡偏强</div>
+            </div>
+            <div class="chip-card" style="text-align: center;">
+                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">风格建议</div>
+                <div style="font-size: 18px; font-weight: 600; color: var(--primary);">哑铃策略</div>
+            </div>
+            <div class="chip-card" style="text-align: center;">
+                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">节奏判断</div>
+                <div style="font-size: 18px; font-weight: 600; color: var(--primary);">短期成长，中期价值</div>
+            </div>
+            <div class="chip-card" style="text-align: center;">
+                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">配置方向</div>
+                <div style="font-size: 18px; font-weight: 600; color: var(--primary);">内需为盾，制造为矛</div>
+            </div>
+            <div class="chip-card" style="text-align: center;">
+                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">风险提示</div>
+                <div style="font-size: 18px; font-weight: 600; color: var(--danger);">地缘/汇率波动</div>
+            </div>
+            <div class="chip-card" style="text-align: center;">
+                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">核心观察</div>
+                <div style="font-size: 18px; font-weight: 600; color: var(--primary);">PPI拐点</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>数据来源：NeoData Financial Search | 腾讯自选股 westock-data | 国家统计局 | Wind</p>
+        <p>分析框架：华泰证券策略研究框架 · 本报告仅供学习参考，不构成投资建议</p>
+        <p>生成时间：<span id="genTime">2026-04-28 14:20:00</span></p>
+    </div>
+
+    <script>
+        // 全局数据存储
+        let marketData = null;
+        
+        // 初始化仪表盘图表
+        function initGauge(elementId, value) {
+            const chart = echarts.init(document.getElementById(elementId));
+            
+            const color = value > 80 ? '#ea4335' : value > 50 ? '#fbbc04' : '#34a853';
+            
+            const option = {
+                series: [{
+                    type: 'gauge',
+                    startAngle: 180,
+                    endAngle: 0,
+                    min: 0,
+                    max: 100,
+                    splitNumber: 5,
+                    itemStyle: {
+                        color: color
+                    },
+                    progress: {
+                        show: true,
+                        width: 12
+                    },
+                    pointer: {
+                        show: false
+                    },
+                    axisLine: {
+                        lineStyle: {
+                            width: 12,
+                            color: [[1, '#3c4043']]
+                        }
+                    },
+                    axisTick: {
+                        show: false
+                    },
+                    splitLine: {
+                        show: false
+                    },
+                    axisLabel: {
+                        show: false
+                    },
+                    anchor: {
+                        show: false
+                    },
+                    detail: {
+                        show: false
+                    },
+                    data: [{ value: value }]
+                }]
+            };
+            
+            chart.setOption(option);
+            return chart;
+        }
+        
+        // 从JSON文件加载数据
+        async function loadMarketData() {
+            try {
+                const response = await fetch('./market_data.json');
+                if (!response.ok) {
+                    throw new Error('Failed to load market data');
+                }
+                marketData = await response.json();
+                updatePageWithData(marketData);
+                console.log('Market data loaded:', marketData);
+            } catch (error) {
+                console.error('Error loading market data:', error);
+                // 使用默认数据
+                updatePageWithDefaultData();
+            }
+        }
+        
+        // 根据数据更新页面
+        function updatePageWithData(data) {
+            // 更新时间
+            if (data.update_date) {
+                document.getElementById('updateTime').textContent = data.update_date;
+            }
+            document.getElementById('genTime').textContent = new Date().toLocaleString('zh-CN');
+            
+            // 更新指数温度
+            const indices = data.indices || {};
+            const indexMap = {
+                'gauge-sh000001': '上证指数',
+                'gauge-sz399001': '深证成指',
+                'gauge-sz399006': '创业板指',
+                'gauge-sh000688': '科创50'
+            };
+            
+            for (const [elementId, indexName] of Object.entries(indexMap)) {
+                const indexData = indices[indexName];
+                if (indexData) {
+                    // 根据涨跌幅计算温度 (0-100)
+                    const change = indexData.change || 0;
+                    const temp = Math.min(100, Math.max(0, 50 + change * 5));
+                    initGauge(elementId, Math.round(temp));
+                    
+                    // 更新温度值显示
+                    const tempId = elementId.replace('gauge-', 'temp-');
+                    const tempEl = document.getElementById(tempId);
+                    if (tempEl) {
+                        tempEl.textContent = Math.round(temp) + '°';
+                        tempEl.style.color = temp > 70 ? '#ea4335' : temp > 40 ? '#fbbc04' : '#34a853';
+                    }
+                }
+            }
+            
+            // 更新三维度信号
+            if (data.signals) {
+                updateSignals(data.signals);
+            }
+            
+            // 更新风格分析
+            if (data.style_analysis) {
+                updateStyleAnalysis(data.style_analysis);
+            }
+            
+            // 更新研判结论
+            if (data.recommendation) {
+                updateRecommendation(data.recommendation);
+            }
+        }
+        
+        // 更新信号面板
+        function updateSignals(signals) {
+            // 这里可以根据实际数据更新信号面板
+            // 由于HTML结构复杂，暂时保持静态
+        }
+        
+        // 更新风格分析
+        function updateStyleAnalysis(style) {
+            // 更新市值风格
+            const marketCapBadge = document.getElementById('style-marketcap-badge');
+            if (marketCapBadge && style['市值风格']) {
+                marketCapBadge.textContent = style['市值风格'];
+            }
+            
+            // 更新估值风格
+            const valuationBadge = document.getElementById('style-valuation-badge');
+            if (valuationBadge && style['估值风格']) {
+                valuationBadge.textContent = style['估值风格'];
+            }
+        }
+        
+        // 更新研判结论
+        function updateRecommendation(rec) {
+            // 这里可以更新结论区域
+        }
+        
+        // 使用默认数据
+        function updatePageWithDefaultData() {
+            document.getElementById('genTime').textContent = new Date().toLocaleString('zh-CN');
+            
+            // 初始化默认仪表盘
+            initGauge('gauge-sh000001', 65);
+            initGauge('gauge-sz399001', 72);
+            initGauge('gauge-sz399006', 78);
+            initGauge('gauge-sh000688', 75);
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 先加载数据，然后初始化图表
+            loadMarketData();
+            
+            // 响应式
+            window.addEventListener('resize', function() {
+                if (marketData) {
+                    updatePageWithData(marketData);
+                } else {
+                    initGauge('gauge-sh000001', 65);
+                    initGauge('gauge-sz399001', 72);
+                    initGauge('gauge-sz399006', 78);
+                    initGauge('gauge-sh000688', 75);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
