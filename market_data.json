@@ -1,36 +1,36 @@
 {
-  "timestamp": "2026-08-14T03:29:34.455799",
-  "update_date": "2026-08-14 03:29",
+  "timestamp": "2026-08-14T08:18:27.317938",
+  "update_date": "2026-08-14 08:18",
   "indices": {
     "上证指数": {
       "code": "sh000001",
-      "close": 0,
-      "change": 0
+      "close": 3927.1764,
+      "change": 0.005
     },
     "沪深300": {
       "code": "sh000300",
-      "close": 0,
-      "change": 0
+      "close": 4665.8812,
+      "change": 0.041
     },
     "深证成指": {
       "code": "sz399001",
-      "close": 0,
-      "change": 0
+      "close": 14354.306,
+      "change": 0.454
     },
     "创业板指": {
       "code": "sz399006",
-      "close": 0,
-      "change": 0
+      "close": 3626.296,
+      "change": 1.122
     },
     "科创50": {
       "code": "sh000688",
-      "close": 0,
-      "change": 0
+      "close": 1717.6793,
+      "change": -0.004
     },
     "中证500": {
       "code": "sh000905",
-      "close": 0,
-      "change": 0
+      "close": 7990.3277,
+      "change": 0.275
     }
   },
   "sectors": {
